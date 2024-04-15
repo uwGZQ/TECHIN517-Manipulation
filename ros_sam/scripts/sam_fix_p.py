@@ -32,6 +32,7 @@ class ImageProcessor:
 
     def image_callback(self, data):
         # Convert ROS Image message to OpenCV format
+        rospy.loginfo("Received an image, processing...")
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
@@ -56,6 +57,8 @@ class ImageProcessor:
                 # Convert the masked image back to ROS Image message
                 masked_msg = self.bridge.cv2_to_imgmsg(masked_image, "bgr8")
                 self.masked_image_pub.publish(masked_msg)
+            rospy.loginfo("Masked image published")
+
 
         except Exception as e:
             rospy.logerr("Failed to process image: %s", e)

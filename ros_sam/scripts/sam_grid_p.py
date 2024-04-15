@@ -17,7 +17,7 @@ class ImageProcessor:
         rospy.loginfo('Waiting for SAM service...')
         rospy.wait_for_service('ros_sam/segment')
         rospy.loginfo('Found SAM service')
-        self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)
         self.masked_image_pub = rospy.Publisher('/masked_images', Image, queue_size=10)
 
     def generate_uniform_points(self, image, grid_size=100):
@@ -29,12 +29,14 @@ class ImageProcessor:
         return np.array(points)
 
     def image_callback(self, data):
+        rospy.loginfo("Received an image, processing...")
         try:
+
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
             cv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
             points = self.generate_uniform_points(cv_image, grid_size=100)  # Change grid size as needed
             labels = np.zeros(len(points))  # Assuming all points are initially negative samples
-            boxes = np.asarray([[54, 350, 1700, 1300]])  # Example box
+            boxes = np.asarray([[10, 10, 1700, 1300]])  # Example box
 
             masks, scores = self.sam.segment(cv_image, points, labels, boxes=boxes)
 
@@ -42,6 +44,7 @@ class ImageProcessor:
                 masked_image = cv2.addWeighted(cv_image, 1, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR), 0.5, 0)
                 masked_msg = self.bridge.cv2_to_imgmsg(masked_image, "bgr8")
                 self.masked_image_pub.publish(masked_msg)
+            rospy.loginfo("Masked image published")
 
         except Exception as e:
             rospy.logerr("Failed to process image: %s", e)
