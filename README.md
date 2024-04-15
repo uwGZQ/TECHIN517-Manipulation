@@ -58,7 +58,7 @@ Clean your workspace and build the specific packages using catkin build:
 
 ```bash
 cd ~/catkin_ws
-catkin clean
+catkin clean # Option
 catkin build ros_sam rqt_image_view_seg
 ```
 
@@ -120,6 +120,32 @@ rosdep install --from-paths ~/catkin_ws/src --ignore-src --rosdistro=${ROS_DISTR
 
 
 
+# Ros_yolo8 Setup Guide
 
+## Clone the ros_yolo Repository
 
+Navigate to the `src` directory of your catkin workspace and clone the `ultralytics_ros` repository using the following command:
 
+```bash
+cd ~/catkin_ws/src  # Navigate to the source directory of your catkin workspace
+GIT_LFS_SKIP_SMUDGE=1 git clone -b noetic-devel https://github.com/Alpaca-zip/ultralytics_ros.git
+```
+
+After cloning, install the required Python dependencies:
+
+```bash
+pip install -r ~/catkin_ws/src/ultralytics_ros/requirements.txt
+```
+Use rosdep to install any additional dependencies:
+
+```bash
+cd ~/catkin_ws
+rosdep install -r -y -i --from-paths .
+```
+Build the cloned repository using catkin build:
+```bash
+catkin build
+```
+
+## Running the System
+Refer to the Run section of the `README` in the ultralytics_ros repository. Set the `input_topic` parameter to `/camera/color/image_raw` when running the node. Commands will vary based on the specific launch files and nodes available in the ultralytics_ros package.
