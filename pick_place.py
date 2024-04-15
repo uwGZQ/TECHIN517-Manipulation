@@ -53,15 +53,8 @@ import os
 from kortex_driver.srv import *
 from kortex_driver.msg import *
 
-CUBE_LOCATIONS = [
+from utils import *
 
-]
-
-def set_pose(position, orientation):
-    pose = geometry_msgs.msg.Pose()
-    pose.position.x, pose.position.y, pose.position.z = position
-    pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w = orientation
-    return pose
 
 class PickAndPlace(object):
   """PickAndPlace"""
@@ -173,9 +166,6 @@ class PickAndPlace(object):
     return arm_group.go(wait=True)
 
   def plan_cartesian_path(self, waypoints, scale=1):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     move_group = self.arm_group
 
     ## BEGIN_SUB_TUTORIAL plan_cartesian_path
@@ -194,9 +184,6 @@ class PickAndPlace(object):
     return plan, fraction
 
   def display_trajectory(self, plan):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     robot = self.robot
     display_trajectory_publisher = self.display_trajectory_publisher
     
@@ -213,15 +200,12 @@ class PickAndPlace(object):
     display_trajectory.trajectory_start = robot.get_current_state()
     display_trajectory.trajectory.append(plan)
     # Publish
-    display_trajectory_publisher.publish(display_trajectory);
+    display_trajectory_publisher.publish(display_trajectory)
 
     ## END_SUB_TUTORIAL
 
 
   def execute_plan(self, plan):
-    # Copy class variables to local variables to make the web tutorials more clear.
-    # In practice, you should use the class variables directly unless you have a good
-    # reason not to.
     move_group = self.arm_group
 
     ## BEGIN_SUB_TUTORIAL execute_plan
@@ -292,35 +276,38 @@ def main(target_pose, final_pose, gripper_ratio):
   if success:
 
     rospy.loginfo("Added cartesian path functions")
-
-    waypoints = []
+    
+    middle_point = average_pose(target_pose.pose, final_pose.pose)
+    
+    waypoints = [target_pose, middle_point, final_pose]
     #print(pnp.get_cartesian_pose())
 
     # pnp.add_box((0.05, 0.6, 0.25), (0.3, -0.3, 0.125), 'wall')
     # pnp.add_box((0.075, 0.075, 0.25), (0.2, -0.2, 0.125), 'stack')
-    pnp.add_box((0.7, 0.7, 0.05), (0.25, -0.25, -0.05), 'floor')
+    pnp.add_box((0.7, 0.7, 0.05), (0.25, -0.25, 0.01), 'floor')
     
     # open gripper
     pnp.reach_named_position("home")
 
     pnp.activate_gripper(0)
     
-
-    pnp.reach_cartesian_pose(target_pose, tolerance=0.015, constraints=None)
+    pnp.plan_cartesian_path(waypoints)
+    pnp.execute_plan()
+    # pnp.reach_cartesian_pose(target_pose, tolerance=0.015, constraints=None)
     time.sleep(0.1)
     pnp.activate_gripper(gripper_ratio)
     time.sleep(0.2)
     
-    pnp.reach_cartesian_pose(final_pose, tolerance=0.02, constraints=None)
-    pnp.activate_gripper(0)
+    # pnp.reach_cartesian_pose(final_pose, tolerance=0.02, constraints=None)
+    # pnp.activate_gripper(0)
 
-    pnp.reach_named_position("home")
+    # pnp.reach_named_position("home")
 
     if not success:
         rospy.logerr("The example encountered an error.")
 
 if __name__ == '__main__':
-  picked_obj = 'sock'
+  picked_obj = 'bottle'
   # transformation equation
   # x′ = 0.05208x
   # y′ = 0.058y+0.003
@@ -335,7 +322,7 @@ if __name__ == '__main__':
     z_axis = 0.13
     target_position = (0.45, -0.20, z_axis)
     target_orientation = (-0.00013, 0.999829, 0.002574, 0.018335) # Quaternion orientation (x, y, z, w)
-    gripper_ratio = 0.7  
+    gripper_ratio = 0.75
 
   target_pose = set_pose(target_position, target_orientation)
 
