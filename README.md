@@ -118,6 +118,7 @@ rosdep install --from-paths ~/catkin_ws/src --ignore-src --rosdistro=${ROS_DISTR
 
 - GUI RuntimeError: If you get a ValueError: `PyCapsule_GetPointer called with incorrect name`, check the following resource for a [solution](https://www.reddit.com/r/Veusz/comments/do9xmm/faq_pycapsule_getpointer_called_with_incorrect/).
 
+- Control_transfer returned error: If you are receiving the control_transfer returned warning only several times during launch and then they stop, or they occur one or two times a minute after launch, then this warning can be safely ignored. [link](https://github.com/IntelRealSense/realsense-ros/issues/1510)
 
 
 # Ros_yolo8 Setup Guide
