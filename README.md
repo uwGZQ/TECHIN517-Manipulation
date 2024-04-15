@@ -93,7 +93,7 @@ roslaunch realsense2_camera rs_camera.launch
 - Run the SAM nodes:
 ```bash
 rosrun ros_sam sam_node.py
-rosrun ros_sam sam_fix_p.py # Alternatively, you can use sam_grid_p.py
+rosrun ros_sam node_subs.py # Alternatively, you can use sam_fix_p.py / sam_grid_p.py
 ```
 
 - Launch the GUI:
@@ -105,7 +105,7 @@ You can use `rqt_plot` to monitor various topics and nodes:
 ```bash
 rosrun rqt_plot rqt_plot
 ```
-On the GUI page, choose `/camera/color/image_raw` for input and `/masked_images` for the output to see the segmented images.
+On the GUI page, choose `/camera/color/image_raw` for input and `/masked_images` or `/segmented/composite_image` for the output to see the segmented images.
 
 ### Common Error Solutions
 
