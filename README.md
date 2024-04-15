@@ -16,3 +16,110 @@ Refer to [Troubleshooting](#troubleshooting-installation-and-patch-related-issue
 3) For ros interface installation, follow these instructions from point **NUMBER 4**
 https://zhaoxuhui.top/blog/2020/09/09/intel-realsense-d435i-installation-and-use.html 
 
+# Ros_sam Setup Guide
+
+This part provides a detailed guide on setting up the `ros_sam` package in a ROS environment. Please follow the steps below to ensure a proper installation.
+
+## Prerequisites
+
+Ensure that you have a working ROS installation and that `catkin` is properly set up on your system. Additionally, you will need `git` and `pip` installed to handle repository cloning and Python packages installation.
+
+## Installation Steps
+
+### 1. Clone the ros_sam Repository
+
+Navigate to the `src` directory of your catkin workspace and clone the `ros_sam` repository using the following command:
+
+```bash
+cd ~/catkin_ws/src  # Replace '~/catkin_ws' with your actual catkin workspace path
+git clone https://github.com/robot-learning-freiburg/ros_sam.git
+```
+
+### 2. Download Model Checkpoints
+
+Navigate to the [Segment-Anything Model Checkpoints](https://github.com/facebookresearch/segment-anything#model-checkpoints) page on GitHub. Download the required checkpoint files and place them in the `ros_sam/model` directory within your workspace.
+
+### 3. Install the Segment-Anything Library
+
+Use pip to install the `segment-anything` library directly from its GitHub repository:
+
+```bash
+pip install git+https://github.com/facebookresearch/segment-anything.git
+```
+
+### 4. Clone the rqt_image_view_seg Repository
+Clone the `rqt_image_view_seg` repository into your catkin workspace's src directory:
+```bash
+git clone https://github.com/ipab-slmc/rqt_image_view_seg.git ~/catkin_ws/src/
+```
+
+### 5. Build the Packages
+Clean your workspace and build the specific packages using catkin build:
+
+```bash
+cd ~/catkin_ws
+catkin clean
+catkin build ros_sam rqt_image_view_seg
+```
+
+
+### 6. Copy Scripts
+Copy the necessary script files from the `ros_sam/scripts` directory to the designated scripts folder in your workspace:
+
+```bash
+cp ~/catkin_ws/src/ros_sam/scripts/* ~/catkin_ws/src/ros_sam/scripts/
+```
+
+### Post-Installation
+
+Ensure to source your catkin workspace to apply all changes:
+
+```bash
+source ~/catkin_ws/devel/setup.bash
+```
+
+## Running the System
+
+Open separate terminals and execute the following commands in each to run the system components:
+
+- Start ROS core:
+```bash
+roscore
+```
+- Launch the RealSense camera:
+```bash
+roslaunch realsense2_camera rs_camera.launch
+```
+- Run the SAM nodes:
+```bash
+rosrun ros_sam sam_node.py
+rosrun ros_sam sam_fix_p.py # Alternatively, you can use sam_grid_p.py
+```
+
+- Launch the GUI:
+```bash
+roslaunch ros_sam gui_test.launch
+```
+You can use `rqt_plot` to monitor various topics and nodes:
+
+```bash
+rosrun rqt_plot rqt_plot
+```
+On the GUI page, choose `/camera/color/image_raw` for input and `/masked_images` for the output to see the segmented images.
+
+### Common Error Solutions
+
+If you encounter errors during execution, here are some solutions:
+
+- Missing Dependencies: Use rosdep to install any missing dependencies: 
+```bash
+rosdep install --from-paths ~/catkin_ws/src --ignore-src --rosdistro=${ROS_DISTRO} -y
+```
+
+- GUI RuntimeError: If you get a ValueError: `PyCapsule_GetPointer called with incorrect name`, check the following resource for a [solution](https://www.reddit.com/r/Veusz/comments/do9xmm/faq_pycapsule_getpointer_called_with_incorrect/).
+
+
+
+
+
+
