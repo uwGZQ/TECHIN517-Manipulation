@@ -150,3 +150,32 @@ catkin build
 
 ## Running the System
 Refer to the Run section of the `README` in the ultralytics_ros repository. Set the `input_topic` parameter to `/camera/color/image_raw` when running the node. Commands will vary based on the specific launch files and nodes available in the ultralytics_ros package.
+
+# Aruco setup
+
+## clone the aurco repo
+Navigate to the `src` directory of your catkin workspace and clone the `aurco` repository using the following command, remember to switch to `noetic-devel` before cloning:
+```
+git clone https://github.com/pal-robotics/aruco_ros.git
+```
+After cloning, navigate to the `aruco_ros` directory and `git checkout 3.1.4`.
+
+Remember to `catkin build` and `source devel/setup.bash` at the end at the `catkin_ws` directory.
+
+## checking aruco marker position
+start realsense camera node
+```
+roslaunch realsense2_camera rs_camera.launch
+```
+Start the single.launch file
+```
+roslaunch aruco_ros single.launch
+```
+Use image_view to observe the recognition effect
+```
+rosrun image_view image_view image:=/aruco_single/result
+```
+Check the posture
+```
+rostopic echo /aruco_single/pose
+```
