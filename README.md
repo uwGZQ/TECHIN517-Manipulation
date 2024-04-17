@@ -179,3 +179,4 @@ Check the posture
 ```
 rostopic echo /aruco_single/pose
 ```
+The `MarkerID` is 582, and the `Markersize` is 0.034m, which can be changed in the `single.launch` file.
