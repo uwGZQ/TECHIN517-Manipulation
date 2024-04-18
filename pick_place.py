@@ -63,9 +63,9 @@ class PickAndPlace(object):
     os.system ("export ROS_HOSTNAME='/my_gen3_lite/'")
     # Initialize the node
     super(PickAndPlace, self).__init__()
-    moveit_commander.roscpp_initialize("/my_gen3_lite/joint_states")
+    # moveit_commander.roscpp_initialize("/my_gen3_lite/joint_states")
     rospy.init_node('example_move_it_trajectories')
-    #moveit_commander.roscpp_initialize(sys.argv)
+    moveit_commander.roscpp_initialize(sys.argv)
 
     try:
       self.is_gripper_present = rospy.get_param("/my_gen3_lite/is_gripper_present", False)
@@ -168,7 +168,18 @@ class PickAndPlace(object):
   def plan_cartesian_path(self, waypoints, scale=1):
     move_group = self.arm_group
 
-    ## BEGIN_SUB_TUTORIAL plan_cartesian_path
+    # waypoints = []
+
+    # wpose = move_group.get_current_pose().pose
+    # wpose.position.z -= scale * 0.1  # First move up (z)
+    # wpose.position.y += scale * 0.2  # and sideways (y)
+    # waypoints.append(copy.deepcopy(wpose))
+
+    # wpose.position.x += scale * 0.1  # Second move forward/backwards in (x)
+    # waypoints.append(copy.deepcopy(wpose))
+
+    # wpose.position.y -= scale * 0.1  # Third move sideways (y)
+    # waypoints.append(copy.deepcopy(wpose))
 
     # We want the Cartesian path to be interpolated at a resolution of 1 cm
     # which is why we will specify 0.01 as the eef_step in Cartesian
@@ -176,9 +187,8 @@ class PickAndPlace(object):
     # ignoring the check for infeasible jumps in joint space, which is sufficient
     # for this tutorial.
     (plan, fraction) = move_group.compute_cartesian_path(
-                                       waypoints,   # waypoints to follow
-                                       0.01,        # eef_step
-                                       0.0)         # jump_threshold
+        waypoints, 0.01, 0  # waypoints to follow  # eef_step
+    )  # jump_threshold
 
     # Note: We are just planning, not asking move_group to actually move the robot yet:
     return plan, fraction
@@ -277,32 +287,41 @@ def main(target_pose, final_pose, gripper_ratio):
 
     rospy.loginfo("Added cartesian path functions")
     
-    middle_point = average_pose(target_pose.pose, final_pose.pose)
+    middle_point = average_pose(target_pose, final_pose)
     
-    waypoints = [target_pose, middle_point, final_pose]
+    waypoints = [target_pose]
     #print(pnp.get_cartesian_pose())
-
     # pnp.add_box((0.05, 0.6, 0.25), (0.3, -0.3, 0.125), 'wall')
     # pnp.add_box((0.075, 0.075, 0.25), (0.2, -0.2, 0.125), 'stack')
-    pnp.add_box((0.7, 0.7, 0.05), (0.25, -0.25, 0.01), 'floor')
+    pnp.add_box((0.7, 0.7, 0.05), (0.25, -0.25, -0.05), 'floor')
     
     # open gripper
     pnp.reach_named_position("home")
-
+    
     pnp.activate_gripper(0)
     
-    pnp.plan_cartesian_path(waypoints)
-    pnp.execute_plan()
-    # pnp.reach_cartesian_pose(target_pose, tolerance=0.015, constraints=None)
+    # Way point method
+    # plan, fraction = pnp.plan_cartesian_path(waypoints)
+    # rospy.loginfo(plan)
+    # rospy.loginfo(fraction)
+    # pnp.execute_plan(plan)
+
+    # Reach method
+    start_time = time.time()
+    pnp.reach_cartesian_pose(target_pose, tolerance=0.015, constraints=None)
     time.sleep(0.1)
     pnp.activate_gripper(gripper_ratio)
-    time.sleep(0.2)
+    time.sleep(0.1)
     
-    # pnp.reach_cartesian_pose(final_pose, tolerance=0.02, constraints=None)
-    # pnp.activate_gripper(0)
+    # --Way point--
+    # pnp.reach_cartesian_pose(middle_point, tolerance=0.02, constraints=None)
+    # time.sleep(0.1)
 
-    # pnp.reach_named_position("home")
-
+    pnp.reach_cartesian_pose(final_pose, tolerance=0.02, constraints=None)
+    pnp.activate_gripper(0)
+    end_time = time.time()
+    pnp.reach_named_position("home")
+    rospy.loginfo(f"Time: {end_time - start_time}")
     if not success:
         rospy.logerr("The example encountered an error.")
 
@@ -319,10 +338,10 @@ if __name__ == '__main__':
     target_orientation = (-0.00013, 0.999829, 0.002574, 0.018335) # Quaternion orientation (x, y, z, w)
     gripper_ratio = 0.55
   elif picked_obj == 'bottle':
-    z_axis = 0.13
+    z_axis = 0.125
     target_position = (0.45, -0.20, z_axis)
     target_orientation = (-0.00013, 0.999829, 0.002574, 0.018335) # Quaternion orientation (x, y, z, w)
-    gripper_ratio = 0.75
+    gripper_ratio = 0.80
 
   target_pose = set_pose(target_position, target_orientation)
 
