@@ -48,7 +48,6 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 from math import pi
 from std_srvs.srv import Empty
-import copy
 import os
 from kortex_driver.srv import *
 from kortex_driver.msg import *
@@ -100,6 +99,9 @@ class PickAndPlace(object):
     send_gripper_command_full_name = '/' + rospy.get_param('~robot_name', 'my_gen3_lite') + '/base/send_gripper_command'
     rospy.wait_for_service(send_gripper_command_full_name)
     self.send_gripper_command = rospy.ServiceProxy(send_gripper_command_full_name, SendGripperCommand)
+
+    # Set constraints
+    self.arm_group.set_path_constraints(add_orientation_constraint(-3.1415269, -1.57079632, 0))
 
   def reach_named_position(self, target):
     arm_group = self.arm_group

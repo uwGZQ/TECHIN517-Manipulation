@@ -1,4 +1,7 @@
 import geometry_msgs.msg
+from geometry_msgs.msg import Quaternion
+from moveit_msgs.msg import Constraints, OrientationConstraint
+import tf
 
 def set_pose(position, orientation):
     pose = geometry_msgs.msg.Pose()
@@ -22,3 +25,29 @@ def average_pose(pose1, pose2, z_delta=0.02):
     middle_pose.orientation.w = (pose1.orientation.w + pose2.orientation.w) / 2
 
     return middle_pose
+
+
+def rpy_to_quaternion(roll, pitch, yaw):
+    quaternion = Quaternion()
+    # Convert roll, pitch, and yaw to quaternion
+    quaternion = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
+    return Quaternion(*quaternion)
+
+def add_orientation_constraint(roll, pitch, yaw):
+    # Create an OrientationConstraint
+    orientation_constraint = OrientationConstraint()
+    orientation_constraint.header.frame_id = "base_link"  # Set the reference frame
+    orientation_constraint.link_name = "gripper_link"  # Set the link to which the constraint applies
+    orientation_constraint.orientation = rpy_to_quaternion(roll, pitch, yaw)
+
+    
+    orientation_constraint.absolute_x_axis_tolerance = 6.28318531
+    orientation_constraint.absolute_y_axis_tolerance = 0.2
+    orientation_constraint.absolute_z_axis_tolerance = 6.28318531
+    orientation_constraint.weight = 1.0  # Set the weight of the constraint
+
+    # Create a Constraints message and add the OrientationConstraint
+    constraints = Constraints()
+    constraints.orientation_constraints.append(orientation_constraint)
+
+    return constraints
