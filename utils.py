@@ -40,10 +40,10 @@ def add_orientation_constraint(roll, pitch, yaw):
     orientation_constraint.link_name = "gripper_link"  # Set the link to which the constraint applies
     orientation_constraint.orientation = rpy_to_quaternion(roll, pitch, yaw)
 
-    
-    orientation_constraint.absolute_x_axis_tolerance = 6.28318531
+    orientation_constraint.orientation.w = 1
+    orientation_constraint.absolute_x_axis_tolerance = 0.2
     orientation_constraint.absolute_y_axis_tolerance = 0.2
-    orientation_constraint.absolute_z_axis_tolerance = 6.28318531
+    orientation_constraint.absolute_z_axis_tolerance = 3.14
     orientation_constraint.weight = 1.0  # Set the weight of the constraint
 
     # Create a Constraints message and add the OrientationConstraint
