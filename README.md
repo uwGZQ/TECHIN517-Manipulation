@@ -153,51 +153,35 @@ Refer to the Run section of the `README` in the ultralytics_ros repository. Set 
 
 # Aruco setup
 
-## clone the aurco repo
-Navigate to the `src` directory of your catkin workspace and clone the `aurco` repository using the following command, remember to switch to `noetic-devel` before cloning:
-```
-git clone https://github.com/pal-robotics/aruco_ros.git
-```
-After cloning, navigate to the `aruco_ros` directory and `git checkout 3.1.4`.
+## Launch the realsense 2 file 
 
-Remember to `catkin build` and `source devel/setup.bash` at the end at the `catkin_ws` directory.
-
-## checking aruco marker position
-start realsense camera node
 ```
 roslaunch realsense2_camera rs_camera.launch
+
 ```
-Start the single.launch file () which you can copy paste from here 
+## Launch the aruco single launch launchfile 
+
 ```
 roslaunch aruco_ros single.launch
-```
-Use image_view to observe the recognition effect
-```
-rosrun image_view image_view image:=/aruco_single/result
-```
-Check the posture
-```
-rostopic echo /aruco_single/pose
-```
-The `MarkerID` is 582, and the `Markersize` is 0.034m, which can be changed in the `single.launch` file.
 
-## running 2 transformation
+```
+## Launch the kortex driver with you Kinova Arm IP
 
-### running `cam_to_marker.py`
-* in the `cam_to_marker.py` script, it initializes a ROS node named `cam_to_marker_node`.
-* It creates a `tf2_ros.TransformBroadcaster` to publish transformations to the TF tree.
-* The `marker_pose_callback` function is defined to receive the marker's pose from the `/aruco_single/pose` topic.
-* Inside the callback function, the marker's rotation and translation are extracted from the received pose message.
-* A `TransformStamped` message is created to represent the transformation from the camera frame to the marker frame.
-* The transformation is published to the TF tree using the `tf_broadcaster.sendTransform()` method.
-* The script subscribes to the `/aruco_single/pose` topic and specifies the `marker_pose_callback` function as the callback.
+```
+roslaunch kortex_driver kortex_driver.launch arm:=gen3_lite ip_address:=10.18.2.240
 
-### running `marker_to_base_link.py`
-* The script initializes a ROS node named `marker_to_base_link_node`.
-* It creates a `tf2_ros.TransformBroadcaster` to publish transformations to the TF tree.
-* The fixed transformation from the marker frame to the base_link frame is defined based on manual measurements. **You need to replace the example values with your actual measurements.**!!!
-* A `TransformStamped` message is created to represent the transformation from the marker frame to the base_link frame.
-* Inside the main loop, the script continuously publishes the transformation to the TF tree using the `tf_broadcaster.sendTransform()` method.
+```
+## Run rqt gui to see tftree, camera view 
+
+```
+rosrun rqt_gui rqt_gui
+```
+## Side Notes for Setup:
+-Add Robot Model in Rviz
+
+-Add tf in rviz 
+
+-Enable frame aruco, base_link and camera_link
 
 
 
