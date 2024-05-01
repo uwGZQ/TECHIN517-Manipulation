@@ -199,6 +199,10 @@ Start the single.launch file
 ```
 roslaunch aruco_ros single.launch
 ```
+Use image_view to observe the recognition effect
+```
+rosrun image_view image_view image:=/aruco_single/result
+```
 rosrun the pipeline script
 ```
 rosrun realsense2_camera pipeline.py
