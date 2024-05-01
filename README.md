@@ -185,3 +185,25 @@ Check the posture
 rostopic echo /aruco_single/pose
 ```
 The `MarkerID` is 582, and the `Markersize` is 0.034m, which can be changed in the `single.launch` file.
+
+## pipeline
+start realsense camera node
+```
+roslaunch realsense2_camera rs_camera.launch
+```
+launch the yolo
+```
+roslaunch ultralytics_ros tracker.launch debug:=true input_topic:=/camera/color/image_raw yolo_model:=epoch300.pt
+```
+Start the single.launch file
+```
+roslaunch aruco_ros single.launch
+```
+rosrun the pipeline script
+```
+rosrun realsense2_camera pipeline.py
+```
+launch kinova arm
+```
+roslaunch kortex_driver kortex_driver.launch arm:=gen3_lite ip_address:=10.18.2.230
+```
