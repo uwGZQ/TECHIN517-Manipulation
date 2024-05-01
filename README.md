@@ -151,6 +151,11 @@ catkin build
 ## Running the System
 Refer to the Run section of the `README` in the ultralytics_ros repository. Set the `input_topic` parameter to `/camera/color/image_raw` when running the node. Commands will vary based on the specific launch files and nodes available in the ultralytics_ros package.
 
+Example use:
+```bash
+roslaunch ultralytics_ros tracker.launch debug:=true input_topic:=/camera/color/image_raw yolo_model:=best.pt
+```
+
 # Aruco setup
 
 ## clone the aurco repo
