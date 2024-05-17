@@ -186,7 +186,7 @@ rostopic echo /aruco_single/pose
 ```
 The `MarkerID` is 582, and the `Markersize` is 0.034m, which can be changed in the `single.launch` file.
 
-## pipeline
+## transformation pipeline
 start realsense camera node
 ```
 roslaunch realsense2_camera rs_camera.launch
@@ -211,3 +211,9 @@ launch kinova arm
 ```
 roslaunch kortex_driver kortex_driver.launch arm:=gen3_lite ip_address:=10.18.2.230
 ```
+
+## yolo with inorbit
+
+socks ID = 80
+bottle ID = 39
+blanket ID = 81
