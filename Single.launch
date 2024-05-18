@@ -20,7 +20,7 @@
         <param name="corner_refinement"  value="$(arg corner_refinement)" />
     </node>
     <node pkg="tf2_ros" type="static_transform_publisher" name="camera_to_aruco_broadcaster" args="x y z yaw pitch roll camera_link aruco_marker_frame" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="aruco_to_base_broadcaster" args="0.08 0 0 -1.57 pitch roll aruco_marker_frame base_link" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="aruco_to_base_broadcaster" args="-0.11 0 0 -1.57 pitch roll aruco_marker_frame base_link" />
 
 
 
