@@ -151,39 +151,63 @@ catkin build
 ## Running the System
 Refer to the Run section of the `README` in the ultralytics_ros repository. Set the `input_topic` parameter to `/camera/color/image_raw` when running the node. Commands will vary based on the specific launch files and nodes available in the ultralytics_ros package.
 
+Example use:
+```bash
+roslaunch ultralytics_ros tracker.launch debug:=true input_topic:=/camera/color/image_raw yolo_model:=best.pt
+```
+
 # Aruco setup
 
-## Launch the realsense 2 file 
+## clone the aurco repo
+Navigate to the `src` directory of your catkin workspace and clone the `aurco` repository using the following command, remember to switch to `noetic-devel` before cloning:
+```
+git clone https://github.com/pal-robotics/aruco_ros.git
+```
+After cloning, navigate to the `aruco_ros` directory and `git checkout 3.1.4`.
 
+Remember to `catkin build` and `source devel/setup.bash` at the end at the `catkin_ws` directory.
+
+## checking aruco marker position
+start realsense camera node
 ```
 roslaunch realsense2_camera rs_camera.launch
-
 ```
-## Launch the aruco single launch launchfile 
-
+Start the single.launch file
 ```
 roslaunch aruco_ros single.launch
-
 ```
-## Launch the kortex driver with you Kinova Arm IP
-
+Use image_view to observe the recognition effect
 ```
-roslaunch kortex_driver kortex_driver.launch arm:=gen3_lite ip_address:=10.18.2.240
-
+rosrun image_view image_view image:=/aruco_single/result
 ```
-## Run rqt gui to see tftree, camera view 
-
+Check the posture
 ```
-rosrun rqt_gui rqt_gui
+rostopic echo /aruco_single/pose
 ```
-## Side Notes for Setup:
--Add Robot Model in Rviz
+The `MarkerID` is 582, and the `Markersize` is 0.034m, which can be changed in the `single.launch` file.
 
--Add tf in rviz 
-
--Enable frame aruco, base_link and camera_link
-
-
-
-
-
+## pipeline
+start realsense camera node
+```
+roslaunch realsense2_camera rs_camera.launch
+```
+launch the yolo
+```
+roslaunch ultralytics_ros tracker.launch debug:=true input_topic:=/camera/color/image_raw yolo_model:=epoch300.pt
+```
+Start the single.launch file
+```
+roslaunch aruco_ros single.launch
+```
+Use image_view to observe the recognition effect
+```
+rosrun image_view image_view image:=/aruco_single/result
+```
+rosrun the pipeline script
+```
+rosrun realsense2_camera pipeline.py
+```
+launch kinova arm
+```
+roslaunch kortex_driver kortex_driver.launch arm:=gen3_lite ip_address:=10.18.2.230
+```
